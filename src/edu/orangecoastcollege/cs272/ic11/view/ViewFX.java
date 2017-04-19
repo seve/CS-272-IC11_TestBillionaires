@@ -18,14 +18,14 @@ import javafx.stage.Stage;
 public class ViewFX extends Application {
 
 	int selectedId = -1;
-	
+
 	ComboBox<String> citizenshipsCB;
 	ComboBox<String> sectorsCB;
 	Slider minWorthSlider = new Slider(0.0, 80.0, 0.0);
 	Slider maxWorthSlider = new Slider(0.0, 80.0, 80.0);
 	ListView<Billionaire> billionairesLV = new ListView<>();
 	Button deleteButton = new Button("Delete");
-	
+
 	ObservableList<Billionaire> billionairesList;
 	Controller controller = Controller.getInstance();
 
@@ -36,7 +36,8 @@ public class ViewFX extends Application {
 		// Associate the employeesLV with the observable list
 		billionairesLV.setItems(billionairesList);
 		billionairesLV.setPrefWidth(800);
-		
+		billionairesLV.setOnMouseClicked(e -> selectBillionaire());
+
 		citizenshipsCB = new ComboBox<>(controller.getDistinctCitizenships());
 		citizenshipsCB.setOnAction(e -> filter());
 
@@ -72,10 +73,12 @@ public class ViewFX extends Application {
 
 		pane.add(new Label("Max Worth ($B):"), 0, 4);
 		pane.add(maxWorthSlider, 1, 4);
-		
-		pane.add(billionairesLV, 0, 5, 2, 1);		
+
+		pane.add(billionairesLV, 0, 5, 2, 1);
 		pane.add(deleteButton, 0, 6);
-		
+		deleteButton.setDisable(true);
+		deleteButton.setOnAction(e -> deleteBillionaire());
+
 		Scene scene = new Scene(pane, 800, 400);
 		primaryStage.setTitle("The World's Billionaires");
 		primaryStage.setScene(scene);
@@ -87,9 +90,21 @@ public class ViewFX extends Application {
 				sectorsCB.getSelectionModel().getSelectedItem(), minWorthSlider.getValue(), maxWorthSlider.getValue());
 		billionairesLV.setItems(billionairesList);
 	}
-		
+
+	private void selectBillionaire() {
+		deleteButton.setDisable(false);
+	}
+
+	private void deleteBillionaire() {
+		controller.deleteBillionaire(billionairesLV.getSelectionModel().getSelectedItem());
+		billionairesLV.getSelectionModel().select(-1);
+		deleteButton.setDisable(true);
+		billionairesLV.setItems(billionairesList);
+
+	}
+
 	public static void main(String[] args) {
 		Application.launch(args);
 	}
-	
+
 }

@@ -16,7 +16,7 @@ public class Controller {
 
 	private static Controller theOne;
 
-	private static final String DB_NAME = "cs272_test.db";
+	private static final String DB_NAME = "cs272.db";
 	private static final String TABLE_NAME = "billionaire";
 	private static final String[] FIELD_NAMES = { "id", "name", "age", "gender", "worth", "citizenship", "sector", "political" };
 	private static final String[] FIELD_TYPES = { "INTEGER PRIMARY KEY", "TEXT", "INTEGER", "TEXT", "REAL", "TEXT", "TEXT", "INTEGER" };
@@ -35,7 +35,7 @@ public class Controller {
 			try {
 				theOne.mDB = new DBModel(DB_NAME, TABLE_NAME, FIELD_NAMES, FIELD_TYPES);
 				theOne.initializeDBFromFile();
-				
+
 					ResultSet rs = theOne.mDB.getAllRecords();
 				if (rs != null) {
 					while (rs.next()) {
@@ -134,5 +134,16 @@ public class Controller {
 			e.printStackTrace();
 		}
 		return recordsCreated;
+	}
+
+	public boolean deleteBillionaire(Billionaire b) {
+		if (b == null)return false;
+		theOne.mAllBillionairesList.remove(b);
+		try {
+			mDB.deleteRecord(String.valueOf(b.getId()));
+			return true;
+		} catch (SQLException e) {
+			return false;
+		}
 	}
 }
