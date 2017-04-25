@@ -86,9 +86,9 @@ public class DBModel {
 	 * @throws SQLException If a database access error occurs, this method is called on a closed Statement,
 	 * or the given SQL statement produces anything other than a single ResultSet object.
 	 */
-	public ResultSet getRecord(String key) throws SQLException
-	{
-		String selectSQL = "SELECT * FROM " + mTableName + "WHERE " + mFieldNames[0] + "=" + key;
+	public ResultSet getRecord(String key) throws SQLException {
+		String selectSQL = "SELECT * FROM " + mTableName + " WHERE " + mFieldNames[0] + " = " + key;
+		System.out.println(selectSQL);
 		return mStmt.executeQuery(selectSQL);
 	}
 
@@ -122,22 +122,31 @@ public class DBModel {
 
 		String[] fieldsOut = new String[mFieldNames.length];
 		String[] valuesOut = new String[mFieldNames.length];
-		valuesOut[0] = "";
-		fieldsOut[0] = "id";
+		int factor;
 
-		for(int j = 0; j < mFieldNames.length - 1;j++) {
-			int i = j + 1;
-			if(i > fields.length) {
-				valuesOut[i] = "";
-				fieldsOut[i] = mFieldNames[i];
+		if(!fields[0].equals("id")) {
+			valuesOut[0] = "";
+			factor = 1;
+		}
+		else {
+//			System.out.println("FIELDS 0  = " + fields[0]);
+			fieldsOut[0] = fields[0];
+//			System.out.println("VALUES[0] = " + values[0]);
+			factor = 0;
+		}
+		fieldsOut[0] = "id";
+		for(int j = 0; j < mFieldNames.length - factor;j++) {
+			if(factor + j > fields.length) {
+				valuesOut[factor + j] = "";
+				fieldsOut[factor + j] = mFieldNames[factor];
 			}
-			else if(mFieldNames[i]!= fields[j]) {
-				valuesOut[i] = "";
-				fieldsOut[i] = mFieldNames[i];
+			else if(mFieldNames[factor + j]!= fields[j]) {
+				valuesOut[factor + j] = "";
+				fieldsOut[factor + j] = mFieldNames[factor];
 			}
 			else {
-				fieldsOut[i] = fields[j];
-				valuesOut[i] = values[j];
+				fieldsOut[factor + j] = fields[j];
+				valuesOut[factor + j] = values[j];
 			}
 
 		}
@@ -170,14 +179,14 @@ public class DBModel {
 
 
 		StringBuilder makeSQL = new StringBuilder("Insert INTO " + mTableName + "(");
-		for(int i = 1; i < fieldsOut.length; i++) {
+		for(int i = factor; i < fieldsOut.length; i++) {
 			makeSQL.append(fieldsOut[i]).append((i < fieldsOut.length - 1)?",":")");
 		}
 		makeSQL.append("VALUES(");
-		for(int i = 1; i < fieldsOut.length;i++){
+		for(int i = factor; i < fieldsOut.length;i++){
 			makeSQL.append(convertToSQLText(fieldsOut[i], valuesOut[i])).append((i < valuesOut.length - 1)?",":")");
 		}
-		System.out.println("SQL: " + makeSQL);
+//		System.out.println(makeSQL.toString());
 		mStmt.executeUpdate(makeSQL.toString());
 		return true;
 	}

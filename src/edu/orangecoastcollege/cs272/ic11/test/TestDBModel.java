@@ -3,20 +3,23 @@
  */
 package edu.orangecoastcollege.cs272.ic11.test;
 
-import static org.junit.Assert.*;
+import edu.orangecoastcollege.cs272.ic11.model.DBModel;
 
-import java.sql.ResultSet;
+import static com.sun.xml.internal.ws.dump.LoggingDumpTube.Position.Before;
+import static junit.framework.TestCase.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.sql.SQLException;
 import java.util.Arrays;
 
+
+
 import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
-
-import edu.orangecoastcollege.cs272.ic11.model.DBModel;
-
 /**
  * @author sbadajoz
  *
@@ -35,7 +38,7 @@ public class TestDBModel {
 	 * Defines variables, resources, etc.
 	 * Executes once before all testing begins
 	 * Does anything needed before testing
-	 * @throws java.lang.Exception
+	 * @throws Exception
 	 */
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -45,7 +48,7 @@ public class TestDBModel {
 	/**
 	 * Cleans up any open resources
 	 * Executes once after all testing has completed
-	 * @throws java.lang.Exception
+	 * @throws Exception
 	 */
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
@@ -54,7 +57,7 @@ public class TestDBModel {
 
 	/**
 	 * Executed before each individual test
-	 * @throws java.lang.Exception
+	 * @throws Exception
 	 */
 	@Before
 	public void setUp() throws Exception {
@@ -68,14 +71,6 @@ public class TestDBModel {
 	@After
 	public void tearDown() throws Exception {
 		db.deleteAllRecords();
-	}
-
-	/**
-	 * Test method for {@link edu.orangecoastcollege.cs272.ic11.model.DBModel#DBModel(java.lang.String, java.lang.String, java.lang.String[], java.lang.String[])}.
-	 */
-	@Test
-	public void testDBModel() {
-		fail("Not yet implemented");
 	}
 
 	/**
@@ -99,7 +94,7 @@ public class TestDBModel {
 		try {
 			db.getRecord(values[0]);
 		} catch (SQLException e) {
-			fail("Getting record on empty database should not generate SQLException.");
+			fail("Getting record on empty database should not generate SQLException." + e.getMessage());
 		}
 
 		try {
@@ -107,7 +102,7 @@ public class TestDBModel {
 			db.getRecord(values[0]);
 		}
 		catch (SQLException e) {
-			fail("Getting record on non-empty database should not generate SQLException.");
+			fail("Getting record on non-empty database should not generate SQLException. " + e.getMessage());
 		}
 	}
 
@@ -132,6 +127,7 @@ public class TestDBModel {
 			assertTrue("Testing creation of billionaire with id provided", db.createRecord(FIELD_NAMES, values));
 			assertEquals("Testing the count of records", 1, db.getRecordCount());
 		} catch (SQLException e) {
+			System.out.println(e.getMessage());
 			fail("Creation of records should not generate an SQLException");
 		}
 

@@ -35,8 +35,7 @@ public class Controller {
 			try {
 				theOne.mDB = new DBModel(DB_NAME, TABLE_NAME, FIELD_NAMES, FIELD_TYPES);
 				theOne.initializeDBFromFile();
-
-					ResultSet rs = theOne.mDB.getAllRecords();
+				ResultSet rs = theOne.mDB.getAllRecords();
 				if (rs != null) {
 					while (rs.next()) {
 						int id = rs.getInt(FIELD_NAMES[0]);
@@ -140,7 +139,7 @@ public class Controller {
 		if (b == null)return false;
 		theOne.mAllBillionairesList.remove(b);
 		try {
-			mDB.deleteRecord(String.valueOf(b.getId()));
+			theOne.mDB.deleteRecord(String.valueOf(b.getId()));
 			return true;
 		} catch (SQLException e) {
 			return false;
