@@ -96,7 +96,19 @@ public class TestDBModel {
 	 */
 	@Test
 	public void testGetRecord() {
-		fail("Not yet implemented");
+		try {
+			db.getRecord(values[0]);
+		} catch (SQLException e) {
+			fail("Getting record on empty database should not generate SQLException.");
+		}
+
+		try {
+			db.createRecord(FIELD_NAMES, values);
+			db.getRecord(values[0]);
+		}
+		catch (SQLException e) {
+			fail("Getting record on non-empty database should not generate SQLException.");
+		}
 	}
 
 	/**
@@ -104,7 +116,11 @@ public class TestDBModel {
 	 */
 	@Test
 	public void testGetRecordCount() {
-		fail("Not yet implemented");
+		try {
+			db.getRecordCount();
+		} catch (SQLException e) {
+			fail("Getting record count should not generate an SQLException.");
+		}
 	}
 
 	/**
@@ -132,7 +148,11 @@ public class TestDBModel {
 	 */
 	@Test
 	public void testUpdateRecord() {
-		fail("Not yet implemented");
+		try {
+			db.updateRecord(values[0], FIELD_NAMES, values);
+		} catch (SQLException e) {
+			fail("Updating a record should not generate an SQLException.");
+		}
 	}
 
 	/**
@@ -155,7 +175,15 @@ public class TestDBModel {
 	 */
 	@Test
 	public void testDeleteRecord() {
-		fail("Not yet implemented");
+		try {
+			db.createRecord(Arrays.copyOfRange(FIELD_NAMES, 1, FIELD_NAMES.length), Arrays.copyOfRange(values, 1, values.length));
+			assertTrue("Before deletion, count should be positive", db.getRecordCount() > 0);
+			db.deleteRecord(values[0]);
+			assertEquals("Count after deletion should be 0.", 0, db.getRecordCount());
+		}
+		catch (SQLException e) {
+			fail("Deletion should not generate an SQLException.");
+		}
 	}
 
 }

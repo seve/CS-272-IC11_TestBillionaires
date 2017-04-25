@@ -122,24 +122,62 @@ public class DBModel {
 
 		String[] fieldsOut = new String[mFieldNames.length];
 		String[] valuesOut = new String[mFieldNames.length];
+		valuesOut[0] = "";
+		fieldsOut[0] = "id";
 
-		for(int i = 0; i < mFieldTypes.length;i++) {
-			if(i >= fields.length || mFieldNames[i] != fields[i]) {
+		for(int j = 0; j < mFieldNames.length - 1;j++) {
+			int i = j + 1;
+			if(i > fields.length) {
 				valuesOut[i] = "";
+				fieldsOut[i] = mFieldNames[i];
 			}
-			else fieldsOut[i] = fields[i];
-			fieldsOut[i] = mFieldNames[i];
+			else if(mFieldNames[i]!= fields[j]) {
+				valuesOut[i] = "";
+				fieldsOut[i] = mFieldNames[i];
+			}
+			else {
+				fieldsOut[i] = fields[j];
+				valuesOut[i] = values[j];
+			}
+
 		}
 
+////		TESTING
+//		System.out.println("TESTING OLD");
+//		System.out.print("FIELDS: ");
+//		for (String s : fields) {
+//			System.out.print(s + ", ");
+//		}
+//		System.out.println();
+//		System.out.print("VALUES: ");
+//		for (String s : values) {
+//			System.out.print(s + ", ");
+//		}
+//		System.out.println();
+//		System.out.println("\nEND TESTING");
+//		System.out.println("TESTING NEW");
+//		System.out.print("FIELDS: ");
+//		for (String s : fieldsOut) {
+//			System.out.print(s + ", ");
+//		}
+//		System.out.println();
+//		System.out.print("VALUES: ");
+//		for (String s : valuesOut) {
+//			System.out.print(s + ", ");
+//		}
+//		System.out.println("\nEND TESTING");
+////		TESTING END
+
+
 		StringBuilder makeSQL = new StringBuilder("Insert INTO " + mTableName + "(");
-		for(int i = 0; i < fieldsOut.length; i++) {
+		for(int i = 1; i < fieldsOut.length; i++) {
 			makeSQL.append(fieldsOut[i]).append((i < fieldsOut.length - 1)?",":")");
 		}
 		makeSQL.append("VALUES(");
-		for(int i = 0; i < fieldsOut.length;i++){
+		for(int i = 1; i < fieldsOut.length;i++){
 			makeSQL.append(convertToSQLText(fieldsOut[i], valuesOut[i])).append((i < valuesOut.length - 1)?",":")");
 		}
-		System.out.println(makeSQL);
+		System.out.println("SQL: " + makeSQL);
 		mStmt.executeUpdate(makeSQL.toString());
 		return true;
 	}
@@ -154,10 +192,20 @@ public class DBModel {
 	 * @return True if the record was updated successfully, false if the fields length does not match the values length (or if fields/values are empty).
 	 * @throws SQLException
 	 */
-	public boolean updateRecord(String key, String[] fields, String[] values) throws SQLException
-	{
-		// TODO: Implement this method
-		return false;
+	public boolean updateRecord(String key, String[] fields, String[] values) throws SQLException {
+		if( fields == null || values == null || fields.length != values.length || fields.length == 0) return false;
+		StringBuilder updateSQL = new StringBuilder("UPDATE ");
+		updateSQL.append(mTableName).append(" ").append(" SET ");
+		for (int i = 0; i < fields.length; i++) {
+			updateSQL
+					.append(fields[i])
+					.append("=")
+					.append(convertToSQLText(fields[i], values[i]))
+					.append(i < fields.length - 1 ? "," : " WHERE ");
+		}
+		updateSQL.append(values[0]).append("=").append(key);
+		mStmt.executeUpdate(updateSQL.toString());
+		return true;
 	}
 
 	/**
@@ -178,9 +226,9 @@ public class DBModel {
 	 * @throws SQLException If a database access error occurs, this method is called on a closed Statement,
 	 * or the given SQL statement produces anything other than a single ResultSet object.
 	 */
-	public void deleteRecord(String key) throws SQLException
-	{
-		// TODO: Implement this method
+	public void deleteRecord(String key) throws SQLException {
+		String sql = "DELETE FROM " + mTableName + " WHERE id = " + key;
+		mStmt.executeUpdate(sql);
 	}
 
 	/**
@@ -192,8 +240,9 @@ public class DBModel {
 	 * @return The value surrounded with single quotes if it's field type is TEXT, otherwise returns the original value.
 	 */
 	private String convertToSQLText(String field, String value) {
+		System.out.println("field: " + field + ", value: " + value);
 		String dataType = "";
-		for(int i = 0; i < mFieldNames.length; i++) {
+		for(int i = 1; i < mFieldNames.length; i++) {
 			if(field.equals(mFieldNames[i])){
 				dataType = mFieldTypes[i];
 				break;
@@ -205,7 +254,7 @@ public class DBModel {
 				return "'" + value + "'";
 			case "INTEGER:":
 				if(value.matches("[-+]?\\d*\\.?\\d+"))
-				return value;
+					return value;
 				return (value.toLowerCase().equals("true")?"1":"0");
 			default:
 				return value;
